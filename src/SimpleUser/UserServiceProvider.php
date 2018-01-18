@@ -2,11 +2,12 @@
 
 namespace SimpleUser;
 
-use Silex\Application;
-use Silex\ServiceProviderInterface;
-use Silex\ControllerProviderInterface;
+use Pimple\Container;
+use Pimple\ServiceProviderInterface;
+use Silex\Api\ControllerProviderInterface;
 use Silex\ControllerCollection;
-use Silex\ServiceControllerResolver;
+use Silex\Application;
+use Silex\Api\ServiceControllerResolver;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleHierarchyVoter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -20,9 +21,9 @@ class UserServiceProvider implements ServiceProviderInterface, ControllerProvide
      * This method should only be used to configure services and parameters.
      * It should not get services.
      *
-     * @param Application $app An Application instance
+     * @param Container $app A Container instance
      */
-    public function register(Application $app)
+    public function register(Container $app)
     {
         // Default options.
         $app['user.options.default'] = array(
@@ -125,10 +126,12 @@ class UserServiceProvider implements ServiceProviderInterface, ControllerProvide
         });
 
         // Token generator.
-        $app['user.tokenGenerator'] = $app->share(function($app) { return new TokenGenerator($app['logger']); });
+        $app['user.tokenGenerator'] = function ($app) {
+            return new TokenGenerator($app['logger']);
+        };
 
         // User manager.
-        $app['user.manager'] = $app->share(function($app) {
+        $app['user.manager'] = function ($app) {
             $app['user.options.init']();
 
             $userManager = new UserManager($app['db'], $app);
@@ -139,15 +142,15 @@ class UserServiceProvider implements ServiceProviderInterface, ControllerProvide
             $userManager->setUserColumns($app['user.options']['userColumns']);
 
             return $userManager;
-        });
+        };
 
         // Current user.
-        $app['user'] = $app->share(function($app) {
+        $app['user'] = function ($app) {
             return ($app['user.manager']->getCurrentUser());
-        });
+        };
 
         // User controller service.
-        $app['user.controller'] = $app->share(function ($app) {
+        $app['user.controller'] = function ($app) {
             $app['user.options.init']();
 
             $controller = new UserController($app['user.manager']);
@@ -157,10 +160,10 @@ class UserServiceProvider implements ServiceProviderInterface, ControllerProvide
             $controller->setEditCustomFields($app['user.options']['editCustomFields']);
 
             return $controller;
-        });
+        };
 
         // User mailer.
-        $app['user.mailer'] = $app->share(function($app) {
+        $app['user.mailer'] = function($app) {
             $app['user.options.init']();
 
             $missingDeps = array();
@@ -182,10 +185,10 @@ class UserServiceProvider implements ServiceProviderInterface, ControllerProvide
             }
 
             return $mailer;
-        });
+        };
 
         // Add a custom security voter to support testing user attributes.
-        $app['security.voters'] = $app->extend('security.voters', function($voters) use ($app) {
+        $app['security.voters'] = $app->extend('security.voters', function ($voters) use ($app) {
             foreach ($voters as $voter) {
                 if ($voter instanceof RoleHierarchyVoter) {
                     $roleHierarchyVoter = $voter;
@@ -287,7 +290,7 @@ class UserServiceProvider implements ServiceProviderInterface, ControllerProvide
         $controllers->method('GET|POST')->match('/{id}/edit', 'user.controller:editAction')
             ->bind('user.edit')
             ->before(function(Request $request) use ($app) {
-                if (!$app['security']->isGranted('EDIT_USER_ID', $request->get('id'))) {
+                if (!$app['security.authorization_checker']->isGranted('EDIT_USER_ID', $request->get('id'))) {
                     throw new AccessDeniedException();
                 }
             });

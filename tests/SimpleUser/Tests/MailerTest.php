@@ -5,7 +5,7 @@ namespace SimpleUser\Tests;
 use SimpleUser\Mailer;
 use SimpleUser\User;
 
-class MailerTest extends \PHPUnit_Framework_TestCase
+class MailerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $swiftmailer;
@@ -105,6 +105,7 @@ Hello, {{ user.name }}. {{ confirmationUrl }}
         $this->mailer->setFromAddress('');
         $this->mailer->setFromName('');
         $this->mailer->sendConfirmationMessage(new User('test@example.com'));
+        $this->assertNull(null);
     }
 
     public function testDisableSending()

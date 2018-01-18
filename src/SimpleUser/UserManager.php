@@ -325,7 +325,7 @@ class UserManager implements UserProviderInterface
     public function getCurrentUser()
     {
         if ($this->isLoggedIn()) {
-            return $this->app['security']->getToken()->getUser();
+            return $this->app['security.token_storage']->getToken()->getUser();
         }
 
         return null;
@@ -338,12 +338,12 @@ class UserManager implements UserProviderInterface
      */
     function isLoggedIn()
     {
-        $token = $this->app['security']->getToken();
+        $token = $this->app['security.token_storage']->getToken();
         if (null === $token) {
             return false;
         }
 
-        return $this->app['security']->isGranted('IS_AUTHENTICATED_REMEMBERED');
+        return $this->app['security.authorization_checker']->isGranted('IS_AUTHENTICATED_REMEMBERED');
     }
 
     /**
@@ -387,7 +387,7 @@ class UserManager implements UserProviderInterface
     public function findBy(array $criteria = array(), array $options = array())
     {
         // Check the identity map first.
-        if (array_key_exists($this->getUserColumns('id'), $criteria) 
+        if (array_key_exists($this->getUserColumns('id'), $criteria)
             && array_key_exists($criteria[$this->getUserColumns('id')], $this->identityMap)) {
             return array($this->identityMap[$criteria[$this->getUserColumns('id')]]);
         }
@@ -580,11 +580,11 @@ class UserManager implements UserProviderInterface
      */
     protected function saveUserCustomFields(User $user)
     {
-        $this->conn->executeUpdate('DELETE FROM ' . $this->conn->quoteIdentifier($this->userCustomFieldsTableName). ' 
+        $this->conn->executeUpdate('DELETE FROM ' . $this->conn->quoteIdentifier($this->userCustomFieldsTableName). '
             WHERE '.$this->getUserColumns('user_id').' = ?', array($user->getId()));
 
         foreach ($user->getCustomFields() as $attribute => $value) {
-            $this->conn->executeUpdate('INSERT INTO ' . $this->conn->quoteIdentifier($this->userCustomFieldsTableName). 
+            $this->conn->executeUpdate('INSERT INTO ' . $this->conn->quoteIdentifier($this->userCustomFieldsTableName).
                     ' ('.$this->getUserColumns('user_id').', '.$this->getUserColumns('attribute').', '.$this->getUserColumns('value').') VALUES (?, ?, ?) ',
                 array($user->getId(), $attribute, $value));
         }
@@ -741,10 +741,10 @@ class UserManager implements UserProviderInterface
      */
     public function loginAsUser(User $user)
     {
-        if (null !== ($current_token = $this->app['security']->getToken())) {
+        if (null !== ($current_token = $this->app['security.token_storage']->getToken())) {
             $providerKey = method_exists($current_token, 'getProviderKey') ? $current_token->getProviderKey() : $current_token->getKey();
             $token = new UsernamePasswordToken($user, null, $providerKey);
-            $this->app['security']->setToken($token);
+            $this->app['security.token_storage']->setToken($token);
 
             $this->app['user'] = $user;
         }

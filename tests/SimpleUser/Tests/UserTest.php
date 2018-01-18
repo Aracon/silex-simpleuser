@@ -4,7 +4,7 @@ namespace SimpleUser\Tests;
 
 use SimpleUser\User;
 
-class UserTest extends \PHPUnit_Framework_TestCase
+class UserTest extends \PHPUnit\Framework\TestCase
 {
     public function testNewUserHasInitialValues()
     {
