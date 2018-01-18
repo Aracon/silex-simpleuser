@@ -7,7 +7,7 @@ use Pimple\ServiceProviderInterface;
 use Silex\Api\ControllerProviderInterface;
 use Silex\ControllerCollection;
 use Silex\Application;
-use Silex\Api\ServiceControllerResolver;
+use Silex\ServiceControllerResolver;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleHierarchyVoter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
