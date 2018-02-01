@@ -705,21 +705,18 @@ class UserManager implements UserProviderInterface
         return $this->userTableName;
     }
 
-    public function setUserColumns(array $userColumns){
-        $conn = $this->conn;
-        //Escape the column names
-
-        $escapedUserColumns = array_map(function($column) use ($conn){
-            return $conn->quoteIdentifier($column,\PDO::PARAM_STR);
-        }, $userColumns);
-
-        //Merge the existing column names
-        $this->userColumns = array_merge($this->userColumns, $escapedUserColumns);
+    public function setUserColumns(array $userColumns)
+    {
+        $this->userColumns = $userColumns;
     }
 
-    public function getUserColumns($column = ""){
-        if ($column == "") return $this->userColumns;
-        else return $this->userColumns[$column];
+    public function getUserColumns($column = "")
+    {
+        if ($column == "") {
+            return $this->userColumns;
+        } else {
+            return $this->userColumns[$column];
+        }
     }
 
     public function setUserCustomFieldsTableName($userCustomFieldsTableName)
