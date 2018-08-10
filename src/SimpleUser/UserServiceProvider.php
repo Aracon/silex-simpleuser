@@ -5,6 +5,7 @@ namespace SimpleUser;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Silex\Api\ControllerProviderInterface;
+use Silex\Api\BootableProviderInterface;
 use Silex\ControllerCollection;
 use Silex\Application;
 use Silex\ServiceControllerResolver;
@@ -13,7 +14,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\RoleHierarchyVoter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Security;
 
-class UserServiceProvider implements ServiceProviderInterface, ControllerProviderInterface
+class UserServiceProvider implements ServiceProviderInterface, ControllerProviderInterface, BootableProviderInterface
 {
     /**
      * Registers services on the given app.
