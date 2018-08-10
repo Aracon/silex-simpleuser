@@ -1,9 +1,9 @@
 {
-    "name": "lracicot/silex-simpleuser",
+    "name": "aracon/silex-simpleuser",
     "type": "library",
     "description": "A simple database-backed user provider for Silex, with associated services and controllers.",
     "keywords": ["silex", "user", "user provider", "simple user provider"],
-    "homepage": "http://github.com/jasongrimes/silex-simpleuser",
+    "homepage": "http://www.jasongrimes.org/2014/09/simple-user-management-in-silex/",
     "license": "BSD-2-Clause",
     "authors": [
         {
@@ -14,7 +14,7 @@
     "require": {
         "php": ">=5.3.0",
         "silex/silex": "~2.0",
-        "symfony/security": ">=2.3",
+        "symfony/security": "~3.1",
         "doctrine/dbal": ">=2.4",
         "symfony/twig-bridge": ">=2.3",
         "jasongrimes/paginator": "~1.0",
